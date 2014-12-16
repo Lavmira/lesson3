@@ -3,20 +3,32 @@ class Storage
     implements Countable, Iterator
 {
     private $__data = array();
-    public function __set($key, $val)
+    private $iterator;
+    function __construct()
     {
-        $this->__data[$key] = $val;
+        $this->__data = array();
     }
-    public function __get($key)
+    function getResult()
     {
-        if (isset ($this->__data[$key]))
+        $this->iterator = new ArrayIterator($this->data);
+    }
+
+
+    public function __set($id, $val)
+    {
+        $this->__data[$id] = $val;
+    }
+    public function __get($id)
+    {
+        if (isset ($this->__data[$id]))
         {
-            return $this->__data[$key];
+            return $this->__data[$id];
         } else
         {
             echo 'Error';
         }
     }
+
     public function count()
     {
         return count($this->__data);
@@ -25,31 +37,40 @@ class Storage
 
     public function current()
     {
-        // TODO: Implement current() method.
+        return current($this->__data);
     }
 
 
     public function next()
     {
-        // TODO: Implement next() method.
+        return next($this->__data);
     }
+
 
 
     public function key()
     {
-        // TODO: Implement key() method.
+        $next = next($this->__data);
+        $key = key($this->__data);
+        if (isset($key)) {
+            return $next[1];
+        } else {
+            $this->beyondLastField = true;
+            return false;
     }
-
+    }
+    private $beyondLastField = false;
 
     public function valid()
     {
-        // TODO: Implement valid() method.
+        return !$this->beyondLastField;
     }
 
 
     public function rewind()
     {
-        // TODO: Implement rewind() method.
+        $this->beyondLastField = false;
+        return reset($this->__data);
     }
 }
 
@@ -59,20 +80,35 @@ $st->bar = 'bar1';
 $st->baz = 'baz1';
 
 echo count($st);
-
-foreach ($st as $name => $value)
-{
-    echo $name . '=' .  $value;
-    echo '<br />';
-}
+echo current($st);
+echo next($st);
+echo valid($st);
+echo key($st);
 
 
 class View
+    extends Storage
 {
-    public function display($pash)
+    private $path;
+
+    public function __construct($path)
     {
+
+        parent::__construct();
+        $this->template_path = $path;
+    }
+    
+
+    public function display($templete)
+    {
+        foreach ($st as $name => $value)
+        {
+            echo $name . '=' .  $value;
+            echo '<br />';
+        }
+
         ob_start();
-        include __DIR__ . '/' . $pash;
+        include __DIR__ . '/' . $templete;
         $ret = ob_get_contents();
         ob_end_clean();
         return $ret;
@@ -80,6 +116,6 @@ class View
 
 }
 $view = new View();
-$html = $view->display('index.html');
+$html = $view->display('view/viewnews.php');
 
 echo $html;

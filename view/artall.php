@@ -6,5 +6,12 @@
 </head>
 <body>
         <h1>Новости</h1>
+
+        <?php foreach ($st as $name => $value)
+        {
+        echo $name . '=' .  $value;
+        echo '<br />';
+        }
+        ?>
 </body>
 </html>
